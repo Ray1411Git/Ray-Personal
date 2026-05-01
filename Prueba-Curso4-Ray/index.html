@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lista de Tareas</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <!--
+    CABECERA: título de la aplicación
+    Uso semántico: header
+  -->
+    <header class="cabecera">
+        <div class="contenedor cabecera-inner">
+            <h1 class="titulo">Lista de Tareas</h1>
+            <p class="subtitulo">Práctica con HTML, CSS y un poco de JS (DOM)</p>
+        </div>
+    </header>
+
+    <!--
+    CONTENIDO PRINCIPAL
+    Uso semántico: main, section, form, ul/li
+  -->
+    <main id="principal" class="contenedor principal">
+        <section class="seccion-tareas" aria-labelledby="enc-tareas">
+            <!-- Título de la sección -->
+            <h2 id="enc-tareas" class="titulo-seccion">Mis tareas</h2>
+
+            <!--
+        FORMULARIO para añadir tareas
+        - label asociado al input
+        - el submit lo gestiona scrpt para no recargar la página
+      -->
+            <form id="form-tarea" class="formulario" action="#" method="get" novalidate>
+                <label for="entrada-tarea" class="etiqueta">Añadir tarea</label>
+                <div class="fila-form">
+                    <input id="entrada-tarea" name="tarea" class="entrada" type="text"
+                        placeholder="Escribe una tarea nueva..." aria-label="Nueva tarea" autocomplete="off" />
+                    <button id="btn-agregar" type="submit" class="btn btn-primario"
+                        aria-label="Añadir tarea">Añadir</button>
+                </div>
+            </form>
+
+            <!--
+        CONTROLES: botones que actúan sobre la lista (funcionan con JS)
+      -->
+            <div class="controles">
+                <button id="btn-eliminar-completadas" type="button" class="btn btn-secundario">Eliminar
+                    completadas</button>
+                <button id="btn-eliminar-todas" type="button" class="btn btn-peligro">Eliminar todas</button>
+            </div>
+
+            <!--
+        FILTROS (solo visuales para la prueba)
+      -->
+            <nav class="filtros" aria-label="Filtros de vista">
+                <span class="texto-filtro">Ver:</span>
+                <ul class="lista-filtros">
+                    <li><a href="#" class="filtro activo" aria-current="page">Todas</a></li>
+                    <li><a href="#" class="filtro">Activas</a></li>
+                    <li><a href="#" class="filtro">Completadas</a></li>
+                </ul>
+            </nav>
+
+            <!--
+        LISTA DE TAREAS
+        - inicialmente vacía (la primera tarea se añade con el botón "Añadir")
+        - cada tarea es un <li> con checkbox, texto y botón eliminar
+      -->
+            <section class="lista-seccion" aria-labelledby="lista-titulo">
+                <h3 id="lista-titulo" class="sr-only">Lista de tareas</h3>
+
+                <ul id="lista-tareas" class="lista-tareas" role="list">
+                    <!-- Lista vacía al inicio; el usuario añadirá la primera tarea -->
+                </ul>
+            </section>
+        </section>
+    </main>
+
+    <!-- PIE -->
+    <footer class="pie">
+        <div class="contenedor pie-inner">
+            <small>Práctica Bootcamp — Lista de Tareas</small>
+        </div>
+    </footer>
+
+    <!-- Script con interacciones mínimas (DOM puro) -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
+
+<script>
+    /*
+    Interacciones mínimas con DOM:
+    - Añadir tarea (submit del formulario)
+    - Marcar/desmarcar tarea (checkbox) -> añade/quita clase 'completada'
+    - Eliminar tarea individual (botón ✕)
+    - Eliminar completadas / eliminar todas
+ */
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('form-tarea');
+        const entrada = document.getElementById('entrada-tarea');
+        const lista = document.getElementById('lista-tareas');
+        const btnEliminarCompletadas = document.getElementById('btn-eliminar-completadas');
+        const btnEliminarTodas = document.getElementById('btn-eliminar-todas');
+
+        // Crear un <li> con la estructura de tarea
+        function crearTareaElemento(texto) {
+            const li = document.createElement('li');
+            li.className = 'tarea';
+
+            // label + checkbox
+            const label = document.createElement('label');
+            label.className = 'check';
+
+            const inputCheck = document.createElement('input');
+            inputCheck.type = 'checkbox';
+            inputCheck.setAttribute('aria-label', `Marcar ${texto} como completada`);
+
+            const spanCheck = document.createElement('span');
+            spanCheck.className = 'check-custom';
+            spanCheck.setAttribute('aria-hidden', 'true');
+
+            label.appendChild(inputCheck);
+            label.appendChild(spanCheck);
+
+            // texto de la tarea
+            const spanTexto = document.createElement('span');
+            spanTexto.className = 'texto-tarea';
+            spanTexto.textContent = texto;
+
+            // boton eliminar
+            const btnEliminar = document.createElement('button');
+            btnEliminar.className = 'btn btn-icon btn-eliminar';
+            btnEliminar.type = 'button';
+            btnEliminar.setAttribute('aria-label', `Eliminar tarea ${texto}`);
+            btnEliminar.textContent = '✕';
+
+            // montar li
+            li.appendChild(label);
+            li.appendChild(spanTexto);
+            li.appendChild(btnEliminar);
+
+            // evento: marcar/desmarcar
+            inputCheck.addEventListener('change', function () {
+                if (inputCheck.checked) {
+                    li.classList.add('completada');
+                } else {
+                    li.classList.remove('completada');
+                }
+            });
+
+            // evento: eliminar tarea
+            btnEliminar.addEventListener('click', function () {
+                li.remove();
+            });
+
+            return li;
+        }
+
+        // Añadir tarea desde el formulario
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const texto = entrada.value.trim();
+            if (!texto) {
+                // señal visual si está vacío
+                entrada.style.borderColor = '#f43f5e';
+                setTimeout(() => (entrada.style.borderColor = ''), 700);
+                return;
+            }
+
+            const nuevaTarea = crearTareaElemento(texto);
+            lista.appendChild(nuevaTarea);
+            entrada.value = '';
+            entrada.focus();
+        });
+
+        // Eliminar completadas
+        btnEliminarCompletadas.addEventListener('click', function () {
+            const completadas = lista.querySelectorAll('.tarea.completada');
+            completadas.forEach(item => item.remove());
+        });
+
+
+        btnEliminarTodas.addEventListener('click', function () {
+            // Si prefieres pedir confirmación, descomenta la siguiente línea:
+            if (!confirm('¿Eliminar todas las tareas?')) return;
+            lista.innerHTML = '';
+        });
+
+        // Nota: las tareas creadas dinámicamente ya tienen sus listeners (se añaden en crearTareaElemento)
+    });
+
+</script>

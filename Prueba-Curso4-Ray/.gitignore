@@ -1,0 +1,14 @@
+```gitignore
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Configuración de editores
+.vscode/
+
+# Archivos de Live Server
+*.cache
