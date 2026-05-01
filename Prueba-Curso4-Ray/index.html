@@ -188,12 +188,9 @@
 
 
         btnEliminarTodas.addEventListener('click', function () {
-            // Si prefieres pedir confirmación, descomenta la siguiente línea:
             if (!confirm('¿Eliminar todas las tareas?')) return;
             lista.innerHTML = '';
         });
-
-        // Nota: las tareas creadas dinámicamente ya tienen sus listeners (se añaden en crearTareaElemento)
     });
 
 </script>
