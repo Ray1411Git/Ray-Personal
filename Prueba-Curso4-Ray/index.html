@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lista de Tareas</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/app.js"></script>
 </head>
 
 <body>
@@ -92,105 +93,3 @@
 </body>
 
 </html>
-
-<script>
-    /*
-    Interacciones mínimas con DOM:
-    - Añadir tarea (submit del formulario)
-    - Marcar/desmarcar tarea (checkbox) -> añade/quita clase 'completada'
-    - Eliminar tarea individual (botón ✕)
-    - Eliminar completadas / eliminar todas
- */
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('form-tarea');
-        const entrada = document.getElementById('entrada-tarea');
-        const lista = document.getElementById('lista-tareas');
-        const btnEliminarCompletadas = document.getElementById('btn-eliminar-completadas');
-        const btnEliminarTodas = document.getElementById('btn-eliminar-todas');
-
-        // Crear un <li> con la estructura de tarea
-        function crearTareaElemento(texto) {
-            const li = document.createElement('li');
-            li.className = 'tarea';
-
-            // label + checkbox
-            const label = document.createElement('label');
-            label.className = 'check';
-
-            const inputCheck = document.createElement('input');
-            inputCheck.type = 'checkbox';
-            inputCheck.setAttribute('aria-label', `Marcar ${texto} como completada`);
-
-            const spanCheck = document.createElement('span');
-            spanCheck.className = 'check-custom';
-            spanCheck.setAttribute('aria-hidden', 'true');
-
-            label.appendChild(inputCheck);
-            label.appendChild(spanCheck);
-
-            // texto de la tarea
-            const spanTexto = document.createElement('span');
-            spanTexto.className = 'texto-tarea';
-            spanTexto.textContent = texto;
-
-            // boton eliminar
-            const btnEliminar = document.createElement('button');
-            btnEliminar.className = 'btn btn-icon btn-eliminar';
-            btnEliminar.type = 'button';
-            btnEliminar.setAttribute('aria-label', `Eliminar tarea ${texto}`);
-            btnEliminar.textContent = '✕';
-
-            // montar li
-            li.appendChild(label);
-            li.appendChild(spanTexto);
-            li.appendChild(btnEliminar);
-
-            // evento: marcar/desmarcar
-            inputCheck.addEventListener('change', function () {
-                if (inputCheck.checked) {
-                    li.classList.add('completada');
-                } else {
-                    li.classList.remove('completada');
-                }
-            });
-
-            // evento: eliminar tarea
-            btnEliminar.addEventListener('click', function () {
-                li.remove();
-            });
-
-            return li;
-        }
-
-        // Añadir tarea desde el formulario
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const texto = entrada.value.trim();
-            if (!texto) {
-                // señal visual si está vacío
-                entrada.style.borderColor = '#f43f5e';
-                setTimeout(() => (entrada.style.borderColor = ''), 700);
-                return;
-            }
-
-            const nuevaTarea = crearTareaElemento(texto);
-            lista.appendChild(nuevaTarea);
-            entrada.value = '';
-            entrada.focus();
-        });
-
-        // Eliminar completadas
-        btnEliminarCompletadas.addEventListener('click', function () {
-            const completadas = lista.querySelectorAll('.tarea.completada');
-            completadas.forEach(item => item.remove());
-        });
-
-
-        btnEliminarTodas.addEventListener('click', function () {
-            if (!confirm('¿Eliminar todas las tareas?')) return;
-            lista.innerHTML = '';
-        });
-    });
-
-</script>
